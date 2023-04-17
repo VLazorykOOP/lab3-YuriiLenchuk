@@ -16,17 +16,17 @@ int main()
     char ch = '5';
     do {
         system("cls");
-        cout << "1 Task1";
-        cout << "2 Task2";
-        cout << "3 Task3";
-        cout << "4 Exit";
+        cout << "1 Task1" << endl;
+        cout << "2 Task2" << endl;
+        cout << "3 Task3" << endl;
+        cout << "4 Exit" << endl;
         ch = cin.get();
 
         cin.get();
 
         switch (ch) {
         case '1': mainExample1();   break;
-        case '2': mainExample3();   break;
+        case '2': mainExample4();   break;
         case '3': mainExample4();   break;
         case '4': return 0;
         }
