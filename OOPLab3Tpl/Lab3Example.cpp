@@ -8,29 +8,54 @@
 #endif
 using namespace std;
 
-class Icosahedron {
-	double a; // side of the icosahedron
+class Parallelogram {
+	double basis;
+	double height;
+	double side;
 	unsigned int color;
+
 public:
-	Icosahedron() : a(1.0), color(0) {}
-	Icosahedron(double ai) : a(ai), color(0) {}
-	Icosahedron(int ic) : a(1.0) { if (ic >= 0) color = ic; else color = 0; }
-	Icosahedron(double a, int c) {
-		this->a = a;
-		if (c >= 0) color = c; else color = 0;
-	}
-	double getA() const
+	Parallelogram() : basis(1.0), color(0), height(1.0), side(1.0) {}
+	Parallelogram(double b, double h, double s, double c) : basis(b), height(h), side(s), color(c) {}
+	Parallelogram(int ic) : basis(1.0), height(1.0), side(1.0) { if (ic >= 0) color = ic; else color = 0; }
+	double getBasis() const
 	{
-		return a;
+		return basis;
 	}
-	void setA(double a)
+	void setBasis(double a)
 	{
 		if (a < 0 || a > 1.e+100)
 		{
 			cout << " Error set  a \n";
 			return;
 		}
-		this->a = a;
+		this->basis = a;
+	}
+	double getHeight() const
+	{
+		return height;
+	}
+	void setHeight(double a)
+	{
+		if (a < 0 || a > 1.e+100)
+		{
+			cout << " Error set  a \n";
+			return;
+		}
+		this->height = a;
+	}
+	double getSide() const
+	{
+		return side;
+	}
+	void setSide(double a)
+	{
+		if (a < 0 || a > 1.e+100)
+		{
+			cout << " Error set  a \n";
+			return;
+		}
+		this->side = a;
 	}
 	double getColor() const
 	{
@@ -46,45 +71,31 @@ public:
 		this->color = c;
 	}
 	double S() {
-		return 5 * a * a * sqrt(3.0);
+		return basis * height;
 	}
-	double V() {
-		return 5 * a * a * a * (3 + sqrt(5.0)) / 12.0;
-	}
-	double r() {
-		return a * (3 + sqrt(5.0)) / (4.0 * sqrt(3.0));
-	}
-	double R() {
-		return sqrt(2 * (5 + sqrt(5.0) * a)) / 4.0;
+	double P() {
+		return 2 * (basis + side);
 	}
 	void printInfo()
 	{
-		cout << "\n a= " << a << " color = " << color;
-		cout << "  S= " << S() << " V = " << V() << "  r= " << r() << " V = " << R() << endl;
+		cout << "\n Basis = " << basis << "Height = " << height << "Side = " << side << " Color = " << color;
+		cout << "  S = " << S() << "  P = " << P() << endl;
 	}
 
 };
 int mainExample1()
 {
-	Icosahedron obj;
+	Parallelogram obj;
 	obj.printInfo();
-	double in_a; int in_color;
-	cout << " Input side and color Icosahedron  "; cin >> in_a >> in_color;
-	Icosahedron obj1(in_a), obj2(in_color), obj3(in_a, in_color);
+	double in_basis, in_height, in_side; int in_color;
+	cout << " Input info: "; cin >> in_basis >> in_height >> in_side >> in_color;
+	Parallelogram obj1(in_color), obj2(in_basis, in_height, in_side, in_color);
 	obj1.printInfo();
 	obj2.printInfo();
-	obj3.printInfo();
-	obj.setA(-5);
-	obj.printInfo();
-	obj.setA(5);
-	obj.printInfo();
-	obj.setA(2.e100);
-	obj.printInfo();
-	obj.setColor(-10);
-	obj.printInfo();
-	obj.setColor(10);
-	obj.printInfo();
-	obj.setColor(10001);
+	obj.setBasis(in_basis);
+	obj.setHeight(in_height);
+	obj.setSide(in_side);
+	obj.setColor(in_color);
 	obj.printInfo();
 	cout << " End testing \n";
 	return 1;
