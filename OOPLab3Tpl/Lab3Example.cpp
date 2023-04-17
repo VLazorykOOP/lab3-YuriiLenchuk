@@ -80,7 +80,7 @@ public:
 	}
 	void printInfo()
 	{
-		cout << "\n Basis = " << basis << "Height = " << height << "Side = " << side << " Color = " << color;
+		cout << "\n Basis = " << basis << "; Height = " << height << "; Side = " << side << "; Color = " << color << endl;
 		cout << "  S = " << S() << "  P = " << P() << endl;
 	}
 
