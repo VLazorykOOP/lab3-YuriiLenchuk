@@ -26,7 +26,7 @@ int main()
 
         switch (ch) {
         case '1': mainExample1();   break;
-        case '2': mainExample4();   break;
+        case '2': mainExample3();   break;
         case '3': mainExample4();   break;
         case '4': return 0;
         }

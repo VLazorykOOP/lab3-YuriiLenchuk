@@ -103,14 +103,14 @@ int mainExample1()
 	return 1;
 }
 
-
+int object_count;
 class ShortVector
 {
 	short* v;
 	int num;   // default num=2
 	int state = 0;
 public:
-	ShortVector() : ShortVector(2) {}
+	ShortVector() : ShortVector(2) { object_count++; }
 	ShortVector(int n) {
 		if (n <= 0) n = 2;  // default num =2;
 		num = n;
@@ -118,18 +118,22 @@ public:
 		for (int i = 0; i < n; i++) {
 			v[i] = 0;
 		}
+		object_count++;
 	}
 	ShortVector(int n, short b) : ShortVector(n) {
 		for (int i = 0; i < num; i++) v[i] = b;
+		object_count++;
 	};
 	ShortVector(int n, short* p) : ShortVector(n) {
 		if (p != nullptr) for (int i = 0; i < num; i++) v[i] = p[i];
+		object_count++;
 	};
 	ShortVector(const ShortVector& s) {
 		num = s.num;
 		v = new short[num];
 		state = s.state;
 		for (int i = 0; i < num; i++)   v[i] = s.v[i];
+		object_count++;
 	};
 	ShortVector operator+(ShortVector s) const {
 		if (num != s.num) {
@@ -219,6 +223,7 @@ public:
 	};
 	~ShortVector() {
 		delete[] v;
+		object_count--;
 	}
 	void set(int index, short x = 0) { if (index >= 0 && index <= num) v[index] = x; else state = 1; }
 	short get(int index) { if (index >= 0 && index <= num) return v[index]; else state = 1; }
@@ -249,21 +254,11 @@ public:
 			cout << " v [ " << i << " ]= "; cin >> v[i];
 		}
 	};
-	ShortVector Add(ShortVector& b) {
-		int tnum;
-		tnum = num < b.num ? num : b.num;
-		if (tnum >= 0) {
-			ShortVector tmp(tnum);
-			for (int i = 0; i < tnum; i++) tmp.v[i] = v[i] + b.v[i];
-			return tmp;
-		}
-		return ShortVector(1);
-	};
-
 };
 
-int mainExample2()
+int mainExample3()
 {
+	object_count = 0;
 	ShortVector v1;
 	cout << "Vector 1: ";
 	v1.Output();
@@ -322,3 +317,191 @@ int mainExample2()
 }
 
 
+class Matrix {
+	short** data;
+	int rows;
+	int cols;
+	int errorState = 0;
+public:
+	Matrix() : Matrix(4) {};
+	Matrix(int n) {
+		data = new short* [n];
+		for (int i = 0; i < n; i++) data[i] = new short[n];
+		rows = n;
+		cols = n;
+		for (int i = 0, j = 0; i < n; i++, j++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				data[i][j] = 0;
+			}
+		}
+	};
+	Matrix(int n, int m, short value = 0) {
+		data = new short* [n];
+		for (int i = 0; i < n; i++) data[i] = new short[m];
+		rows = n;
+		cols = m;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				data[i][j] = value;
+			}
+		}
+	};
+	Matrix(const Matrix& other) : Matrix(other.rows, other.cols) {
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				data[i][j] = other.data[i][j];
+			}
+		}
+	};
+	Matrix& operator=(const Matrix other) {
+		if (rows != other.rows && cols != other.cols) {
+			for (int i = 0; i < rows; i++) delete[] data[i];
+			delete[] data;
+			rows = other.rows;
+			cols = other.cols;
+			data = new short* [rows];
+			for (int i = 0; i < cols; i++) data[i] = new short[cols];
+			errorState = other.errorState;
+		}
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				data[i][j] = other.data[i][j];
+			}
+		}
+		return *this;
+	};
+	~Matrix() {
+		for (int i = 0; i < rows; i++) delete[] data[i];
+		delete[] data;
+	};
+
+	void set(int i, int j, short value = 0) {
+		data[i][j] = value;
+	}
+	short get(int i, int j) const {
+		 return data[i][j];
+	};
+
+
+	Matrix operator+(const Matrix& other) {
+		if(rows != other.rows || cols != other.cols) { Matrix result(1); errorState = 1; return result; }
+		Matrix result(rows, cols);
+		for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) result.data[i][j] = data[i][j] + other.data[i][j];
+		return result;
+	};
+	Matrix operator-(const Matrix& other) {
+		if (rows != other.rows || cols != other.cols) { Matrix result(1); errorState = 1; return result; }
+		Matrix result(rows, cols);
+		for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) result.data[i][j] = data[i][j] - other.data[i][j];
+		return result;
+	}
+	Matrix operator*(Matrix other) {
+		if (cols != other.rows) { Matrix result(1); errorState = 1; return result; }
+		Matrix result(rows, cols);
+		for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++){
+			for (int k = 0; k < cols; k++) result.data[i][j] += data[i][k] * other.data[k][j];
+		}
+		return result;
+	}
+	Matrix operator*(short scalar) {
+		Matrix result(rows, cols);
+		for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) result.data[i][j] = data[i][j] * scalar;
+		return result;
+	}
+
+	bool operator==(const Matrix& other) const {
+		if (rows != other.rows || cols != other.cols) { return false; }
+		for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) if (data[i][j] != other.data[i][j]) return false;
+		return true;
+	};
+	bool operator!=(const Matrix& other) const {
+		if (rows != other.rows || cols != other.cols) { return true; }
+		for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) if (data[i][j] != other.data[i][j]) return true;
+		return false;
+	};;
+	bool operator>(const Matrix& other) const {
+		if (rows != other.rows || cols != other.cols) { cout << "Size failure"; return false; }
+		for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) if (data[i][j] <= other.data[i][j]) return false;
+		return true;
+	};
+	bool operator>=(const Matrix& other) const {
+		if (rows != other.rows || cols != other.cols) { cout << "Size failure"; return false; }
+		for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) if (data[i][j] < other.data[i][j]) return false;
+		return true;
+	};
+
+	void print() const {
+		for (int i = 0; i < rows; i++, cout << endl) for (int j = 0; j < cols; j++) cout << data[i][j] << ' ';
+	};
+	void printError() const {
+		if (errorState == 1)
+		{
+			cout << "index error";
+		}
+		else
+		{
+			cout << "memory error";
+		}
+	};
+};
+
+
+
+int mainExample4() {
+	setlocale(LC_ALL, "ukr");
+	Matrix m1;
+	cout << "m1:" << endl;
+	m1.print();
+
+	Matrix m2(3);
+	cout << "m2:" << endl;
+	m2.print();
+
+	Matrix m3(2, 5, 10);
+	cout << "m3:" << endl;
+	m3.print();
+
+	Matrix m4(m3);
+	cout << "m4 (копія m3):" << endl;
+	m4.print();
+
+	m1.set(3, 2, 7);
+	cout << "m1 (змінений елемент [3,2]):" << endl;
+	m1.print();
+
+	short element = m3.get(1, 3);
+	cout << "Елемент [1,3] матриці m3: " << element << endl; // повинно вивести 10
+
+	Matrix m5(3, 3, 3);
+	Matrix m6(3, 3, 5);
+	Matrix m7 = m5 + m6;
+	cout << "m7 (сума m5 та m6):" << endl;
+	m7.print(); // повинно вивести матрицю розміром 2x5, заповнену значеннями 8
+
+	Matrix m8 = m6 - m5; 
+	cout << "m8 (різниця m6 та m5):" << endl;
+	m8.print(); // повинно вивести матрицю розміром 2x5, заповнену значеннями 2
+
+	Matrix m9 = m5 * m6; 
+	cout << "m9(добуток m5 та m6)" << endl;
+	m9.print(); // повинно вивести матрицю розміром 3x3, заповнену значеннями 45
+
+	cout << "m9(добуток m5 на 5)" << endl;
+	m9 = m9 * ((short) 5);
+	m9.print(); // повинно вивести матрицю розміром 3x3, заповнену значеннями 225
+
+	cout << "m7 == m8: " << (m7 == m8) << endl;
+	cout << "m7 != m8: " << (m7 != m8) << endl;
+	cout << "m7 > m8: " << (m7 > m8) << endl;
+	cout << "m7 >= m8: " << (m7 >= m8) << endl;
+
+	return 0;
+}
