@@ -100,7 +100,8 @@ int mainExample1()
 	obj.setColor(in_color);
 	obj.printInfo();
 	cout << " End testing \n";
-	return 1;
+	char x = cin.get();
+	return 0;
 }
 
 int object_count;
